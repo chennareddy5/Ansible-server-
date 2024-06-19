@@ -1,0 +1,19 @@
+- hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+    - name: Check if key pair exists
+      ec2_key:
+        name: key-pair
+        region: us-east-2
+      register: keyout
+
+    - debug:
+        var: keyout
+
+    - name: store login key
+      copy:
+        content: "{{keyout.key.private_key}}"
+        dest: ./sample-key.pem
+      when: keyout.changed or not keyout.key
+
